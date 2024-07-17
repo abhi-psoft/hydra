@@ -363,7 +363,8 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) (err erro
 		return cmdx.FailSilently(cmd)
 	}
 
-	_, _ = fmt.Fprintln(cmd.OutOrStdout(), "Successfully applied migrations!")
+	_, _ = fmt.Fprintln(cmd.OutOrStdout(), "Successfully applied migrations!!!")
+	_, _ = fmt.Fprintln(cmd.OutOrStdout(), "Hello world")
 	return nil
 }
 

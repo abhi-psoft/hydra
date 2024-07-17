@@ -1,0 +1,33 @@
+FROM golang:1.21 AS builder
+
+WORKDIR /go/src/github.com/ory/hydra
+
+RUN apt-get update && apt-get upgrade -y &&\
+    mkdir -p /var/lib/sqlite &&\
+    mkdir -p ./internal/httpclient
+
+COPY go.mod go.sum ./
+COPY internal/httpclient/go.* ./internal/httpclient/
+
+ENV GO111MODULE on
+ENV CGO_ENABLED 1
+
+RUN go mod download
+
+COPY . .
+RUN go build -tags sqlite,json1 -o /usr/bin/hydra
+
+#########################
+
+FROM gcr.io/distroless/base-nossl-debian12:nonroot AS runner
+
+COPY --from=builder --chown=nonroot:nonroot /var/lib/sqlite /var/lib/sqlite
+COPY --from=builder /usr/bin/hydra /usr/bin/hydra
+
+VOLUME /var/lib/sqlite
+
+# Declare the standard ports used by hydra (4444 for public service endpoint, 4445 for admin service endpoint)
+EXPOSE 4444 4445
+
+ENTRYPOINT ["hydra"]
+CMD ["serve", "all"]
