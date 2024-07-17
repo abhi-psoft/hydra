@@ -82,6 +82,7 @@ type RegistryBase struct {
 	buildDate       string
 	r               Registry
 	persister       persistence.Persister
+	nsqlPersister   persistence.PersisterNSQL
 	jfs             fosite.JWKSFetcherStrategy
 	oc              fosite.Configurator
 	oidcs           jwk.JWTSigner

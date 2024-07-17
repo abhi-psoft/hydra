@@ -25,3 +25,8 @@ type Registry interface {
 	OAuth2HMACStrategy() *foauth2.HMACSHAStrategy
 	config.Provider
 }
+
+type RegistryNSQL interface {
+	Registry
+	XClientManager() Manager // Add your new method here
+}

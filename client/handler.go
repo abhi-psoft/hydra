@@ -29,6 +29,7 @@ import (
 
 type Handler struct {
 	r InternalRegistry
+	n RegistryNSQL
 }
 
 const (
@@ -193,9 +194,14 @@ func (h *Handler) CreateClient(r *http.Request, validator func(context.Context, 
 	c.RegistrationAccessTokenSignature = signature
 	c.RegistrationClientURI = urlx.AppendPaths(h.r.Config().PublicURL(r.Context()), DynClientsHandlerPath+"/"+c.GetID()).String()
 
-	if err := h.r.ClientManager().CreateClient(r.Context(), &c); err != nil {
+	// if err := h.r.ClientManager().CreateClient(r.Context(), &c); err != nil {
+	// 	return nil, err
+	// }
+
+	if err := h.n.XClientManager().CreateClient(r.Context(), &c); err != nil {
 		return nil, err
 	}
+
 	c.Secret = ""
 	if !c.IsPublic() {
 		c.Secret = secret
