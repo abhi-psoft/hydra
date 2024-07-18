@@ -48,8 +48,16 @@ type Storage interface {
 	CountClients(ctx context.Context) (int, error)
 
 	GetConcreteClient(ctx context.Context, id string) (*Client, error)
+
+	StorageNSQL
 }
 
 type ManagerProvider interface {
 	ClientManager() Manager
+}
+
+// NSQL
+
+type StorageNSQL interface {
+	CreateClientNSQL(ctx context.Context, c *Client) error
 }

@@ -7,6 +7,7 @@ import (
 	"context"
 	"crypto/subtle"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -29,7 +30,6 @@ import (
 
 type Handler struct {
 	r InternalRegistry
-	n RegistryNSQL
 }
 
 const (
@@ -156,6 +156,7 @@ func (h *Handler) createOidcDynamicClient(w http.ResponseWriter, r *http.Request
 }
 
 func (h *Handler) CreateClient(r *http.Request, validator func(context.Context, *Client) error, isDynamic bool) (*Client, error) {
+	_, _ = fmt.Println("CreateClient Controller")
 	var c Client
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
 		return nil, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err))
@@ -194,11 +195,9 @@ func (h *Handler) CreateClient(r *http.Request, validator func(context.Context, 
 	c.RegistrationAccessTokenSignature = signature
 	c.RegistrationClientURI = urlx.AppendPaths(h.r.Config().PublicURL(r.Context()), DynClientsHandlerPath+"/"+c.GetID()).String()
 
-	// if err := h.r.ClientManager().CreateClient(r.Context(), &c); err != nil {
-	// 	return nil, err
-	// }
+	_, _ = fmt.Println("CreateClient Controller Calling DB: ")
 
-	if err := h.n.XClientManager().CreateClient(r.Context(), &c); err != nil {
+	if err := h.r.ClientManager().CreateClientNSQL(r.Context(), &c); err != nil {
 		return nil, err
 	}
 

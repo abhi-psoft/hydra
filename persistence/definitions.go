@@ -45,26 +45,4 @@ type (
 		NetworkID(ctx context.Context) uuid.UUID
 		DetermineNetwork(ctx context.Context) (*networkx.Network, error)
 	}
-
-	// for Nsql
-
-	PersisterNSQL interface {
-		consent.Manager
-		client.Manager
-		x.FositeStorer
-		jwk.Manager
-		trust.GrantManager
-
-		MigrationStatus(ctx context.Context) (popx.MigrationStatuses, error)
-		MigrateDown(context.Context, int) error
-		MigrateUp(context.Context) error
-		PrepareMigration(context.Context) error
-		Connection(context.Context) *pop.Connection
-		Transaction(context.Context, func(ctx context.Context, c *pop.Connection) error) error
-		Ping() error
-		Networker
-	}
-	ProviderNSQL interface {
-		PersisterNSQL() PersisterNSQL
-	}
 )
