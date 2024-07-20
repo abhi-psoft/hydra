@@ -31,7 +31,6 @@ import (
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/persistence"
-	"github.com/ory/hydra/v2/persistence/aerospike"
 	"github.com/ory/x/flagx"
 )
 
@@ -324,16 +323,6 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) (err erro
 		return err
 	}
 
-	//Add condition check for NOSQL
-	if true {
-		err := aerospike.NewAerospikeConn()
-		if err != nil {
-			_, _ = fmt.Fprintln(cmd.ErrOrStderr(), "Error in Aerospike Connection: \n%+v\n", err)
-			// return cmdx.FailSilently(cmd)
-		}
-		// return nil
-	}
-
 	conn := p.Connection(context.Background())
 	if conn == nil {
 		_, _ = fmt.Fprintln(cmd.ErrOrStderr(), "Migrations can only be executed against a SQL-compatible driver but DSN is not a SQL source.")
@@ -377,6 +366,7 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) (err erro
 
 	_, _ = fmt.Fprintln(cmd.OutOrStdout(), "Successfully applied migrations!!!")
 	_, _ = fmt.Fprintln(cmd.OutOrStdout(), "Hello world")
+
 	return nil
 }
 

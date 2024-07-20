@@ -19,6 +19,7 @@ services:
     environment:
       - DSN=sqlite:///var/lib/sqlite/db.sqlite?_fk=true
       - SECRETS_SYSTEM=a-very-secret-secret-12345 # Add your secret here
+      - IS_NSQL=true
     restart: unless-stopped
     depends_on:
       - hydra-migrate
@@ -32,6 +33,7 @@ services:
     environment:
       - DSN=sqlite:///var/lib/sqlite/db.sqlite?_fk=true
       - SECRETS_SYSTEM=a-very-secret-secret-12345 # Add your secret here
+      - IS_NSQL=true
     command: migrate -c /etc/config/hydra/hydra.yml sql -e --yes
     volumes:
       - type: volume

@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -197,8 +198,17 @@ func (h *Handler) CreateClient(r *http.Request, validator func(context.Context, 
 
 	_, _ = fmt.Println("CreateClient Controller Calling DB: ")
 
-	if err := h.r.ClientManager().CreateClientNSQL(r.Context(), &c); err != nil {
-		return nil, err
+	var isNsql = os.Getenv("IS_NSQL")
+	_, _ = fmt.Println("CreateClient Controller Calling DB: ", isNsql)
+
+	if isNsql == "true" {
+		if err := h.r.ClientManager().CreateClientNSQL(r.Context(), &c); err != nil {
+			return nil, err
+		}
+	} else {
+		if err := h.r.ClientManager().CreateClient(r.Context(), &c); err != nil {
+			return nil, err
+		}
 	}
 
 	c.Secret = ""

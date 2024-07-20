@@ -8,6 +8,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -43,11 +44,16 @@ import (
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2"
+	"github.com/ory/hydra/v2/persistence/aerospike"
 	"github.com/ory/hydra/v2/x"
 	prometheus "github.com/ory/x/prometheusx"
 )
 
 var _ = &consent.Handler{}
+
+func init() {
+	go AerospikeConn()
+}
 
 func EnhanceMiddleware(ctx context.Context, sl *servicelocatorx.Options, d driver.Registry, n *negroni.Negroni, address string, router *httprouter.Router, iface config.ServeInterface) http.Handler {
 	if !networkx.AddressIsUnixSocket(address) {
@@ -298,10 +304,23 @@ func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *h
 
 	adminmw.Use(metrics)
 	publicmw.Use(metrics)
-
 	d.RegisterRoutes(ctx, admin, public)
 
 	return
+}
+
+func AerospikeConn() {
+	var isNsql = os.Getenv("IS_NSQL")
+
+	if isNsql == "true" {
+		err := aerospike.NewAerospikeConn()
+		if err != nil {
+			_, _ = fmt.Println("Error in Aerospike Connection: ", err)
+			return
+		}
+		_, _ = fmt.Println("Aerospike Connected...")
+		return
+	}
 }
 
 func serve(
